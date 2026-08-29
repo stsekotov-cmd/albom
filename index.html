@@ -82,6 +82,12 @@
                     <label id="labelYear" class="block text-sm font-medium text-gray-700 mb-1">Год (для папки по умолчанию)</label>
                     <input type="number" id="yearInput" placeholder="Например: 1985" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" value="2026">
                 </div>
+                
+                <!-- Статус загрузки -->
+                <div id="uploadStatus" class="hidden text-sm font-medium text-amber-800 bg-amber-50 p-3 rounded-xl text-center">
+                    ⏳ Загрузка файлов... Пожалуйста, подождите.
+                </div>
+
                 <button onclick="uploadMedia()" id="btnSave" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-medium py-3 px-4 rounded-xl transition text-lg">
                     Сохранить в архив
                 </button>
@@ -122,7 +128,7 @@
 
     <script>
         let db;
-        const dbName = "FamilyAlbumDB_FolderUpload_Del";
+        const dbName = "FamilyAlbumDB_SafeUpload";
         const storeName = "media";
 
         let currentActiveYear = null;
@@ -152,7 +158,8 @@
                 alertNoFile: "Пожалуйста, выберите файлы или папку",
                 btnDeleteFolder: "🗑️ Удалить папку",
                 confirmDeleteFile: "Удалить этот файл?",
-                confirmDeleteFolder: "Вы уверены, что хотите удалить всю папку со всеми файлами?"
+                confirmDeleteFolder: "Вы уверены, что хотите удалить всю папку со всеми файлами?",
+                uploadingText: "⏳ Сохранение файлов в архив. Пожалуйста, не закрывайте страницу..."
             },
             de: {
                 pageTitle: "Familienarchiv",
@@ -177,7 +184,8 @@
                 alertNoFile: "Bitte wählen Sie Dateien oder einen Ordner aus",
                 btnDeleteFolder: "🗑️ Ordner löschen",
                 confirmDeleteFile: "Diese Datei löschen?",
-                confirmDeleteFolder: "Möchten Sie diesen Ordner wirklich mit allen Dateien löschen?"
+                confirmDeleteFolder: "Möchten Sie diesen Ordner wirklich mit allen Dateien löschen?",
+                uploadingText: "⏳ Dateien werden gespeichert. Bitte schließen Sie die Seite nicht..."
             }
         };
 
@@ -225,6 +233,7 @@
             document.getElementById('noResults').innerText = t.noResults;
             document.getElementById('footerText').innerText = t.footerText;
             document.getElementById('btnDeleteFolder').innerText = t.btnDeleteFolder;
+            document.getElementById('uploadStatus').innerText = t.uploadingText;
         }
 
         function initDB() {
@@ -449,17 +458,17 @@
             const folderInput = document.getElementById('folderInput');
             const captionInput = document.getElementById('captionInput');
             const yearInput = document.getElementById('yearInput');
+            const statusDiv = document.getElementById('uploadStatus');
+            const saveBtn = document.getElementById('btnSave');
             const t = translations[currentLang];
 
             let allFilesToProcess = [];
 
             if (folderInput.files && folderInput.files.length > 0) {
-                // Если выбрана папка через webkitdirectory
                 for (let file of folderInput.files) {
                     if (file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/')) {
                         let detectedYear = yearInput.value.trim() || "2026";
                         
-                        // Пытаемся найти год в пути папки (например, "2012/vacation/photo.jpg")
                         const pathParts = file.webkitRelativePath.split('/');
                         for (let part of pathParts) {
                             if (/^(19|20)\d{2}$/.test(part)) {
@@ -476,7 +485,6 @@
                     }
                 }
             } else if (filesInput.files && filesInput.files.length > 0) {
-                // Обычная загрузка файлов
                 for (let file of filesInput.files) {
                     allFilesToProcess.push({
                         file: file,
@@ -491,26 +499,46 @@
                 return;
             }
 
-            for (let item of allFilesToProcess) {
-                await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    let fileType = 'image';
-                    if (item.file.type.startsWith('video/')) fileType = 'video';
-                    if (item.file.type.startsWith('audio/')) fileType = 'audio';
+            // Показываем статус загрузки и блокируем кнопку
+            statusDiv.classList.remove('hidden');
+            saveBtn.disabled = true;
+            saveBtn.classList.add('opacity-50');
 
-                    reader.onload = async function(e) {
-                        const newMedia = {
-                            type: fileType,
-                            url: e.target.result,
-                            caption: item.caption,
-                            year: item.year
-                        };
-                        await addMediaToDB(newMedia);
-                        resolve();
-                    }
-                    reader.readAsDataURL(item.file);
-                });
+            try {
+                for (let item of allFilesToProcess) {
+                    await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        let fileType = 'image';
+                        if (item.file.type.startsWith('video/')) fileType = 'video';
+                        if (item.file.type.startsWith('audio/')) fileType = 'audio';
+
+                        reader.onload = async function(e) {
+                            try {
+                                const newMedia = {
+                                    type: fileType,
+                                    url: e.target.result,
+                                    caption: item.caption,
+                                    year: item.year
+                                };
+                                await addMediaToDB(newMedia);
+                                resolve();
+                            } catch (err) {
+                                reject(err);
+                            }
+                        }
+                        reader.onerror = () => reject(reader.error);
+                        reader.readAsDataURL(item.file);
+                    });
+                }
+            } catch (error) {
+                alert("Ошибка при сохранении файлов (возможно, папка слишком большая для памяти браузера). Попробуйте загружать файлы поменьше.");
+                console.error(error);
             }
+
+            // Скрываем статус и очищаем форму
+            statusDiv.classList.add('hidden');
+            saveBtn.disabled = false;
+            saveBtn.classList.remove('opacity-50');
 
             filesInput.value = '';
             folderInput.value = '';
