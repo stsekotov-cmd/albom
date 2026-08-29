@@ -48,27 +48,39 @@
     <main class="max-w-4xl mx-auto px-4 flex-grow w-full">
         
         <!-- Навигация "Хлебные крошки" (для папок) -->
-        <div id="breadcrumb" class="hidden mb-6 flex items-center gap-2 text-amber-900 text-lg font-medium">
-            <button onclick="goToHome()" class="hover:underline flex items-center gap-1" id="breadcrumbRoot">📁 Альбомы по годам</button>
-            <span>/</span>
-            <span id="currentFolderTitle" class="font-bold text-amber-950"></span>
+        <div id="breadcrumb" class="hidden mb-6 flex items-center justify-between text-amber-900 text-lg font-medium">
+            <div class="flex items-center gap-2">
+                <button onclick="goToHome()" class="hover:underline flex items-center gap-1" id="breadcrumbRoot">📁 Архивы по годам</button>
+                <span>/</span>
+                <span id="currentFolderTitle" class="font-bold text-amber-950"></span>
+            </div>
+            <button onclick="deleteCurrentFolder()" id="btnDeleteFolder" class="text-xs bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-xl transition font-medium">🗑️ Удалить папку</button>
         </div>
 
         <!-- Панель загрузки -->
         <div id="adminPanel" class="hidden bg-white p-6 rounded-2xl shadow-md mb-8 border border-amber-200">
-            <h3 id="adminPanelTitle" class="text-lg font-bold text-amber-900 mb-3">Загрузить медиафайл</h3>
+            <h3 id="adminPanelTitle" class="text-lg font-bold text-amber-900 mb-3">Загрузить медиафайлы или папку</h3>
             <div class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Загрузка файлов -->
+                    <div class="p-4 border border-amber-100 rounded-xl bg-amber-50/50">
+                        <label id="labelChooseFiles" class="block text-sm font-medium text-gray-700 mb-1">Файлы (фото, видео, аудио)</label>
+                        <input type="file" id="mediaInput" multiple accept="image/*,video/*,audio/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-100 file:text-amber-800 hover:file:bg-amber-200">
+                    </div>
+                    <!-- Загрузка папки -->
+                    <div class="p-4 border border-amber-100 rounded-xl bg-amber-50/50">
+                        <label id="labelChooseFolder" class="block text-sm font-medium text-gray-700 mb-1">Целая папка</label>
+                        <input type="file" id="folderInput" webkitdirectory directory multiple class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-800 file:text-white hover:file:bg-amber-900">
+                    </div>
+                </div>
+
                 <div>
-                    <label id="labelChooseFile" class="block text-sm font-medium text-gray-700 mb-1">Выберите файл (Фото, Видео или Аудио)</label>
-                    <input type="file" id="mediaInput" accept="image/*,video/*,audio/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                    <label id="labelCaption" class="block text-sm font-medium text-gray-700 mb-1">Описание (для отдельных файлов)</label>
+                    <input type="text" id="captionInput" placeholder="Например: Отпуск" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm">
                 </div>
                 <div>
-                    <label id="labelCaption" class="block text-sm font-medium text-gray-700 mb-1">Описание / Место</label>
-                    <input type="text" id="captionInput" placeholder="Например: Семейное видео / Песня" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg">
-                </div>
-                <div>
-                    <label id="labelYear" class="block text-sm font-medium text-gray-700 mb-1">Год (для папки)</label>
-                    <input type="number" id="yearInput" placeholder="Например: 1985" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg" value="2026">
+                    <label id="labelYear" class="block text-sm font-medium text-gray-700 mb-1">Год (для папки по умолчанию)</label>
+                    <input type="number" id="yearInput" placeholder="Например: 1985" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm" value="2026">
                 </div>
                 <button onclick="uploadMedia()" id="btnSave" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-medium py-3 px-4 rounded-xl transition text-lg">
                     Сохранить в архив
@@ -110,7 +122,7 @@
 
     <script>
         let db;
-        const dbName = "FamilyAlbumDB_Media_Full";
+        const dbName = "FamilyAlbumDB_FolderUpload_Del";
         const storeName = "media";
 
         let currentActiveYear = null;
@@ -124,19 +136,23 @@
                 searchPlaceholder: "Поиск...",
                 btnAdd: "+ Добавить",
                 breadcrumbRoot: "📁 Архивы по годам",
-                adminPanelTitle: "Загрузить медиафайл (фото, видео, аудио)",
-                labelChooseFile: "Выберите файл",
-                labelCaption: "Описание / Место",
-                captionPlaceholder: "Например: Семейное видео",
-                labelYear: "Год (для папки)",
+                adminPanelTitle: "Загрузить медиафайлы или папку целиком",
+                labelChooseFiles: "Файлы (фото, видео, аудио)",
+                labelChooseFolder: "Целая папка (автораспознавание лет)",
+                labelCaption: "Описание (для одиночных файлов)",
+                captionPlaceholder: "Например: Отпуск",
+                labelYear: "Год (если не определился)",
                 btnSave: "Сохранить в архив",
                 noResults: "Ничего не найдено по вашему запросу.",
                 footerText: "Создано с теплом и заботой о семье",
                 openFolder: "Открыть",
                 itemsCount: "файлов",
-                defaultCaption: "Семейный архивный материал",
+                defaultCaption: "Архивный материал",
                 noYear: "Без года",
-                alertNoFile: "Пожалуйста, выберите файл"
+                alertNoFile: "Пожалуйста, выберите файлы или папку",
+                btnDeleteFolder: "🗑️ Удалить папку",
+                confirmDeleteFile: "Удалить этот файл?",
+                confirmDeleteFolder: "Вы уверены, что хотите удалить всю папку со всеми файлами?"
             },
             de: {
                 pageTitle: "Familienarchiv",
@@ -145,19 +161,23 @@
                 searchPlaceholder: "Suchen...",
                 btnAdd: "+ Hinzufügen",
                 breadcrumbRoot: "📁 Alben nach Jahren",
-                adminPanelTitle: "Mediendatei hochladen (Foto, Video, Audio)",
-                labelChooseFile: "Datei auswählen",
-                labelCaption: "Beschreibung / Ort",
-                captionPlaceholder: "Z.B.: Familienvideo",
-                labelYear: "Jahr (für den Ordner)",
+                adminPanelTitle: "Mediendateien oder ganzen Ordner hochladen",
+                labelChooseFiles: "Dateien (Foto, Video, Audio)",
+                labelChooseFolder: "Ganzer Ordner",
+                labelCaption: "Beschreibung",
+                captionPlaceholder: "Z.B.: Urlaub",
+                labelYear: "Jahr (Standard)",
                 btnSave: "Im Archiv speichern",
                 noResults: "Nichts gefunden für Ihre Anfrage.",
                 footerText: "Mit Wärme und Fürsorge für die Familie erstellt",
                 openFolder: "Öffnen",
                 itemsCount: "Dateien",
-                defaultCaption: "Familienarchivmaterial",
+                defaultCaption: "Archivmaterial",
                 noYear: "Ohne Jahr",
-                alertNoFile: "Bitte wählen Sie eine Datei aus"
+                alertNoFile: "Bitte wählen Sie Dateien oder einen Ordner aus",
+                btnDeleteFolder: "🗑️ Ordner löschen",
+                confirmDeleteFile: "Diese Datei löschen?",
+                confirmDeleteFolder: "Möchten Sie diesen Ordner wirklich mit allen Dateien löschen?"
             }
         };
 
@@ -196,13 +216,15 @@
             document.getElementById('btnAdd').innerText = t.btnAdd;
             document.getElementById('breadcrumbRoot').innerText = t.breadcrumbRoot;
             document.getElementById('adminPanelTitle').innerText = t.adminPanelTitle;
-            document.getElementById('labelChooseFile').innerText = t.labelChooseFile;
+            document.getElementById('labelChooseFiles').innerText = t.labelChooseFiles;
+            document.getElementById('labelChooseFolder').innerText = t.labelChooseFolder;
             document.getElementById('labelCaption').innerText = t.labelCaption;
             document.getElementById('captionInput').placeholder = t.captionPlaceholder;
             document.getElementById('labelYear').innerText = t.labelYear;
             document.getElementById('btnSave').innerText = t.btnSave;
             document.getElementById('noResults').innerText = t.noResults;
             document.getElementById('footerText').innerText = t.footerText;
+            document.getElementById('btnDeleteFolder').innerText = t.btnDeleteFolder;
         }
 
         function initDB() {
@@ -239,6 +261,16 @@
                 const transaction = db.transaction(storeName, "readwrite");
                 const store = transaction.objectStore(storeName);
                 const request = store.add(media);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function deleteMediaFromDB(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(storeName, "readwrite");
+                const store = transaction.objectStore(storeName);
+                const request = store.delete(Number(id));
                 request.onsuccess = () => resolve(request.result);
                 request.onerror = () => reject(request.error);
             });
@@ -298,7 +330,6 @@
 
             sortedYears.forEach(year => {
                 const count = yearsMap[year].length;
-                // Ищем первое фото для обложки папки, если нет - заглушка
                 let coverPhoto = "https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=1000&q=80";
                 const imgItem = yearsMap[year].find(item => item.type === 'image');
                 if (imgItem) coverPhoto = imgItem.url;
@@ -334,17 +365,16 @@
 
             mediaList.slice().reverse().forEach((item) => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 flex flex-col cursor-pointer hover:shadow-md transition';
-                card.onclick = () => openModal(item);
+                card.className = 'bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-100 flex flex-col transition relative group';
                 
                 let previewHTML = '';
                 if (item.type === 'image') {
-                    previewHTML = `<div class="h-64 sm:h-72 w-full overflow-hidden bg-gray-100 relative">
+                    previewHTML = `<div class="h-64 sm:h-72 w-full overflow-hidden bg-gray-100 relative cursor-pointer" onclick='openModal(${JSON.stringify(item)})'>
                         <img src="${item.url}" alt="${escapeHtml(item.caption)}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
                         <span class="absolute top-3 left-3 bg-amber-800 text-white text-xs px-2.5 py-1 rounded-lg">🖼️ Фото</span>
                     </div>`;
                 } else if (item.type === 'video') {
-                    previewHTML = `<div class="h-64 sm:h-72 w-full overflow-hidden bg-black relative flex items-center justify-center">
+                    previewHTML = `<div class="h-64 sm:h-72 w-full overflow-hidden bg-black relative flex items-center justify-center cursor-pointer" onclick='openModal(${JSON.stringify(item)})'>
                         <video src="${item.url}" class="w-full h-full object-cover opacity-80"></video>
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center text-2xl shadow-lg">▶️</div>
@@ -353,7 +383,7 @@
                     </div>`;
                 } else if (item.type === 'audio') {
                     previewHTML = `<div class="h-48 sm:h-56 w-full bg-amber-50 relative flex flex-col items-center justify-center p-6 border-b border-amber-100">
-                        <div class="text-5xl mb-3">🎵</div>
+                        <div class="text-5xl mb-3 cursor-pointer" onclick='openModal(${JSON.stringify(item)})'>🎵</div>
                         <audio controls src="${item.url}" class="w-full" onclick="event.stopPropagation()"></audio>
                         <span class="absolute top-3 left-3 bg-amber-800 text-white text-xs px-2.5 py-1 rounded-lg">🎧 Аудио</span>
                     </div>`;
@@ -361,13 +391,35 @@
 
                 card.innerHTML = `
                     ${previewHTML}
-                    <div class="p-4 bg-white flex-grow flex justify-between items-center">
-                        <p class="text-lg sm:text-xl text-gray-800 font-medium">${escapeHtml(item.caption)}</p>
-                        <span class="text-xs bg-gray-100 px-2 py-1 rounded-md text-gray-600">${item.year || t.noYear}</span>
+                    <div class="p-4 bg-white flex-grow flex justify-between items-center gap-2">
+                        <p class="text-base sm:text-lg text-gray-800 font-medium truncate">${escapeHtml(item.caption)}</p>
+                        <button onclick="deleteItem(${item.id})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-xl transition text-xs" title="Удалить">🗑️</button>
                     </div>
                 `;
                 gallery.appendChild(card);
             });
+        }
+
+        async function deleteItem(id) {
+            const t = translations[currentLang];
+            if (confirm(t.confirmDeleteFile)) {
+                await deleteMediaFromDB(id);
+                renderApp();
+            }
+        }
+
+        async function deleteCurrentFolder() {
+            const t = translations[currentLang];
+            if (!confirm(t.confirmDeleteFolder)) return;
+
+            const mediaList = await getAllMediaFromDB();
+            const yearItems = mediaList.filter(p => (p.year || t.noYear) === currentActiveYear);
+
+            for (const item of yearItems) {
+                await deleteMediaFromDB(item.id);
+            }
+
+            goToHome();
         }
 
         function openFolder(year) {
@@ -393,38 +445,78 @@
         }
 
         async function uploadMedia() {
-            const fileInput = document.getElementById('mediaInput');
+            const filesInput = document.getElementById('mediaInput');
+            const folderInput = document.getElementById('folderInput');
             const captionInput = document.getElementById('captionInput');
             const yearInput = document.getElementById('yearInput');
             const t = translations[currentLang];
 
-            if (fileInput.files && fileInput.files[0]) {
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                
-                let fileType = 'image';
-                if (file.type.startsWith('video/')) fileType = 'video';
-                if (file.type.startsWith('audio/')) fileType = 'audio';
+            let allFilesToProcess = [];
 
-                reader.onload = async function(e) {
-                    const newMedia = {
-                        type: fileType,
-                        url: e.target.result,
-                        caption: captionInput.value.trim() || t.defaultCaption,
-                        year: yearInput.value.trim() || "2026"
-                    };
+            if (folderInput.files && folderInput.files.length > 0) {
+                // Если выбрана папка через webkitdirectory
+                for (let file of folderInput.files) {
+                    if (file.type.startsWith('image/') || file.type.startsWith('video/') || file.type.startsWith('audio/')) {
+                        let detectedYear = yearInput.value.trim() || "2026";
+                        
+                        // Пытаемся найти год в пути папки (например, "2012/vacation/photo.jpg")
+                        const pathParts = file.webkitRelativePath.split('/');
+                        for (let part of pathParts) {
+                            if (/^(19|20)\d{2}$/.test(part)) {
+                                detectedYear = part;
+                                break;
+                            }
+                        }
 
-                    await addMediaToDB(newMedia);
-
-                    fileInput.value = '';
-                    captionInput.value = '';
-                    toggleAdminPanel();
-                    goToHome();
+                        allFilesToProcess.push({
+                            file: file,
+                            caption: file.name.substring(0, file.name.lastIndexOf('.')) || file.name,
+                            year: detectedYear
+                        });
+                    }
                 }
-                reader.readAsDataURL(file);
-            } else {
-                alert(t.alertNoFile);
+            } else if (filesInput.files && filesInput.files.length > 0) {
+                // Обычная загрузка файлов
+                for (let file of filesInput.files) {
+                    allFilesToProcess.push({
+                        file: file,
+                        caption: captionInput.value.trim() || file.name,
+                        year: yearInput.value.trim() || "2026"
+                    });
+                }
             }
+
+            if (allFilesToProcess.length === 0) {
+                alert(t.alertNoFile);
+                return;
+            }
+
+            for (let item of allFilesToProcess) {
+                await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    let fileType = 'image';
+                    if (item.file.type.startsWith('video/')) fileType = 'video';
+                    if (item.file.type.startsWith('audio/')) fileType = 'audio';
+
+                    reader.onload = async function(e) {
+                        const newMedia = {
+                            type: fileType,
+                            url: e.target.result,
+                            caption: item.caption,
+                            year: item.year
+                        };
+                        await addMediaToDB(newMedia);
+                        resolve();
+                    }
+                    reader.readAsDataURL(item.file);
+                });
+            }
+
+            filesInput.value = '';
+            folderInput.value = '';
+            captionInput.value = '';
+            toggleAdminPanel();
+            goToHome();
         }
 
         function openModal(item) {
@@ -450,7 +542,6 @@
         function closeModal() {
             const modal = document.getElementById('modal');
             modal.classList.add('hidden');
-            // Останавливаем воспроизведение видео/аудио при закрытии
             const mediaElements = modal.querySelectorAll('video, audio');
             mediaElements.forEach(el => el.pause());
         }
