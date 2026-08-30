@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Семейный Архив</title>
+    <title>Семейные фото</title>
     <!-- Tailwind CSS через CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #F8F7FA; /* Легкий лавандово-молочный фон */
+            background-color: #F8F7FA; /* Лавандово-молочный фон */
             color: #2D2625;
         }
         input, button {
@@ -19,7 +19,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-purple-200">
 
-    <!-- Шапка приложения (Цвет дерева + Синий + Лаванда) -->
+    <!-- Шапка приложения (Цвет дерева + Синий акцент + Лаванда) -->
     <header class="bg-[#4A3324] text-white shadow-lg sticky top-0 z-30 border-b-4 border-[#3178C6]">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
             
@@ -30,26 +30,34 @@
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                     <span id="txt-home">На главную</span>
                 </button>
-                <h1 id="app-title" class="text-2xl md:text-3xl font-bold tracking-wide text-[#EBE5F5]">Семейный Архив</h1>
+                <h1 id="app-title" class="text-2xl md:text-3xl font-bold tracking-wide text-[#EBE5F5]">Семейные фото</h1>
             </div>
 
-            <!-- Управление: Поиск, Загрузка, Язык -->
+            <!-- Управление: Поиск, Загрузки, Язык -->
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <!-- Поиск -->
-                <div class="relative flex-1 md:w-72">
+                <div class="relative flex-1 md:w-64">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-purple-200">
                         <!-- SVG Лупа -->
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                     </span>
-                    <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Поиск по имени или году..." class="w-full pl-10 pr-4 py-3 bg-[#3A261C] border border-[#6B5344] rounded-xl text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-[#7B68EE]">
+                    <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Поиск..." class="w-full pl-10 pr-4 py-3 bg-[#3A261C] border border-[#6B5344] rounded-xl text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-[#7B68EE]">
                 </div>
 
-                <!-- Кнопка загрузки папки (Яркий синий акцент) -->
-                <label class="flex items-center gap-2 bg-[#1E56A0] hover:bg-[#164380] text-white px-5 py-3 rounded-xl cursor-pointer shadow-md transition font-semibold text-lg border border-blue-400">
-                    <!-- SVG Папка плюс -->
-                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/></svg>
-                    <span id="txt-upload">Загрузить папку</span>
+                <!-- Кнопка загрузки папок (множество папок сразу) -->
+                <label class="flex items-center gap-2 bg-[#1E56A0] hover:bg-[#164380] text-white px-4 py-3 rounded-xl cursor-pointer shadow-md transition font-semibold text-lg border border-blue-400">
+                    <!-- SVG Папки -->
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                    <span id="txt-upload-folders">Загрузить папки</span>
                     <input type="file" id="folder-input" webkitdirectory directory multiple class="hidden" onchange="handleFolderUpload(event)">
+                </label>
+
+                <!-- Кнопка загрузки отдельных файлов -->
+                <label class="flex items-center gap-2 bg-[#5A4573] hover:bg-[#48375C] text-white px-4 py-3 rounded-xl cursor-pointer shadow-md transition font-semibold text-lg border border-purple-400">
+                    <!-- SVG Файлы -->
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                    <span id="txt-upload-files">Файлы</span>
+                    <input type="file" id="file-input" multiple class="hidden" onchange="handleFilesUpload(event)">
                 </label>
 
                 <!-- Переключатель языка -->
@@ -77,7 +85,7 @@
     <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
         <!-- Заголовок раздела -->
         <div id="section-header" class="mb-6 flex justify-between items-center border-b border-purple-200 pb-3">
-            <h2 id="current-section-title" class="text-3xl font-bold text-[#4A3324]">Все папки архива</h2>
+            <h2 id="current-section-title" class="text-3xl font-bold text-[#4A3324]">Все альбомы и папки</h2>
         </div>
 
         <!-- Сетка папок / файлов -->
@@ -88,7 +96,7 @@
         <!-- Заглушка пустого состояния -->
         <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
             <svg class="w-24 h-24 text-purple-300 mb-4 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-            <p id="empty-text" class="text-2xl text-stone-600 font-medium">Архив пока пуст. Загрузите первую папку!</p>
+            <p id="empty-text" class="text-2xl text-stone-600 font-medium">Архив пока пуст. Загрузите папки или файлы!</p>
         </div>
     </main>
 
@@ -103,7 +111,7 @@
 
     <!-- Футер -->
     <footer class="bg-[#EBE5F5] text-[#4A3324] py-6 text-center border-t border-purple-200 mt-auto font-medium">
-        <p id="footer-text">Семейный архив памяти. Работает локально и безопасно на вашем устройстве.</p>
+        <p id="footer-text">Семейные фото. Работает локально и безопасно на вашем устройстве.</p>
     </footer>
 
     <!-- Скрипт приложения -->
@@ -111,35 +119,35 @@
         const i18n = {
             ru: {
                 home: "На главную",
-                title: "Семейный Архив",
-                upload: "Загрузить папку",
-                searchPlaceholder: "Поиск по имени или году...",
-                empty: "Архив пока пуст. Загрузите первую папку!",
-                allFolders: "Все папки архива",
+                title: "Семейные фото",
+                uploadFolders: "Загрузить папки",
+                uploadFiles: "Файлы",
+                searchPlaceholder: "Поиск...",
+                empty: "Архив пока пуст. Загрузите папки или файлы!",
+                allFolders: "Все альбомы и папки",
                 filesCount: "файлов",
-                year: "Год",
-                deleteFolderConfirm: "Вы уверены, что хотите удалить всю папку вместе с файлами?",
+                deleteFolderConfirm: "Вы уверены, что хотите удалить эту папку вместе с файлами?",
                 deleteFileConfirm: "Удалить этот файл?",
                 loadingTitle: "Идет загрузка файлов...",
                 loadingProgress: "Обработано файлов:",
                 loadingSub: "Пожалуйста, не закрывайте вкладку...",
-                footer: "Семейный архив памяти. Работает локально и безопасно на вашем устройстве."
+                footer: "Семейные фото. Работает локально и безопасно на вашем устройстве."
             },
             de: {
                 home: "Startseite",
-                title: "Familienarchiv",
-                upload: "Ordner hochladen",
-                searchPlaceholder: "Suche nach Name oder Jahr...",
-                empty: "Das Archiv ist noch leer. Laden Sie den ersten Ordner hoch!",
-                allFolders: "Alle Archivordner",
+                title: "Familienfotos",
+                uploadFolders: "Ordner hochladen",
+                uploadFiles: "Dateien",
+                searchPlaceholder: "Suche...",
+                empty: "Das Archiv ist noch leer. Laden Sie Ordner oder Dateien hoch!",
+                allFolders: "Alle Alben und Ordner",
                 filesCount: "Dateien",
-                year: "Jahr",
                 deleteFolderConfirm: "Möchten Sie diesen Ordner und alle darin enthaltenen Dateien wirklich löschen?",
                 deleteFileConfirm: "Diese Datei löschen?",
                 loadingTitle: "Dateien werden geladen...",
                 loadingProgress: "Verarbeitete Dateien:",
                 loadingSub: "Bitte schließen Sie den Tab nicht...",
-                footer: "Familiengedächtnis-Archiv. Läuft lokal und sicher auf Ihrem Gerät."
+                footer: "Familienfotos. Läuft lokal und sicher auf Ihrem Gerät."
             }
         };
 
@@ -149,7 +157,8 @@
             currentLang = lang;
             document.getElementById('txt-home').innerText = i18n[lang].home;
             document.getElementById('app-title').innerText = i18n[lang].title;
-            document.getElementById('txt-upload').innerText = i18n[lang].upload;
+            document.getElementById('txt-upload-folders').innerText = i18n[lang].uploadFolders;
+            document.getElementById('txt-upload-files').innerText = i18n[lang].uploadFiles;
             document.getElementById('search-input').placeholder = i18n[lang].searchPlaceholder;
             document.getElementById('empty-text').innerText = i18n[lang].empty;
             document.getElementById('prog-title').innerText = i18n[lang].loadingTitle;
@@ -163,7 +172,7 @@
         }
 
         let db;
-        const DB_NAME = 'FamilyArchiveDB';
+        const DB_NAME = 'FamilyPhotosDB';
         const DB_VERSION = 1;
 
         function initDB() {
@@ -197,7 +206,6 @@
             return match ? match[0] : 'Общий';
         }
 
-        // Надежное определение медиафайла с фолбэком на расширение (если браузер не передал mime-type)
         function getMediaType(file) {
             const mime = file.type || '';
             const name = file.name.toLowerCase();
@@ -208,25 +216,108 @@
             return null;
         }
 
+        // Загрузка множества папок (с поддержкой подпапок)
         async function handleFolderUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            let folderName = "Новая папка";
-            const firstPath = files[0].webkitRelativePath;
-            if (firstPath) {
-                const parts = firstPath.split('/');
-                if (parts.length > 0) folderName = parts[0];
-            }
+            // Группируем файлы по подпапкам
+            const folderMap = new Map(); // путь папки -> массив файлов
+            
+            for (let file of files) {
+                const type = getMediaType(file);
+                if (!type) continue;
 
-            const folderYear = extractYear(folderName);
+                let folderPath = "Мои фото";
+                if (file.webkitRelativePath) {
+                    const parts = file.webkitRelativePath.split('/');
+                    if (parts.length > 1) {
+                        parts.pop(); // убираем имя файла
+                        folderPath = parts.join(' / ');
+                    }
+                }
+
+                if (!folderMap.has(folderPath)) {
+                    folderMap.set(folderPath, []);
+                }
+                folderMap.get(folderPath).push({ file, type });
+            }
 
             const modal = document.getElementById('progress-modal');
             const progBar = document.getElementById('prog-bar');
             const progText = document.getElementById('prog-text');
             modal.classList.remove('hidden');
 
-            const folderId = await dbAddFolder({ name: folderName, year: folderYear });
+            const totalEntries = Array.from(folderMap.values()).reduce((acc, curr) => acc + curr.length, 0);
+            let processed = 0;
+
+            for (let [folderPath, fileList] of folderMap.entries()) {
+                const folderName = folderPath.split(' / ').pop();
+                const folderYear = extractYear(folderPath);
+                const folderId = await dbAddFolder({ name: folderName, year: folderYear, path: folderPath });
+
+                const batchSize = 10;
+                for (let i = 0; i < fileList.length; i += batchSize) {
+                    const chunk = fileList.slice(i, i + batchSize);
+
+                    await Promise.all(chunk.map(item => {
+                        return new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onload = async function(e) {
+                                try {
+                                    const blob = new Blob([e.target.result], { type: item.file.type || 'application/octet-stream' });
+                                    await dbAddFile({
+                                        folderId: folderId,
+                                        name: item.file.name,
+                                        type: item.type,
+                                        blob: blob,
+                                        year: folderYear,
+                                        size: item.file.size
+                                    });
+                                } catch (err) {
+                                    console.error("Ошибка сохранения файла:", item.file.name, err);
+                                }
+                                processed++;
+                                resolve();
+                            };
+                            reader.onerror = () => { processed++; resolve(); };
+                            reader.readAsArrayBuffer(item.file);
+                        });
+                    }));
+
+                    const percent = totalEntries > 0 ? Math.round((processed / totalEntries) * 100) : 100;
+                    progBar.style.width = percent + '%';
+                    progText.innerText = `${i18n[currentLang].loadingProgress} ${processed} из ${totalEntries} (${percent}%)`;
+                    await new Promise(r => setTimeout(r, 10));
+                }
+            }
+
+            modal.classList.add('hidden');
+            progBar.style.width = '0%';
+            event.target.value = '';
+            await loadData();
+        }
+
+        // Загрузка отдельных файлов
+        async function handleFilesUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const modal = document.getElementById('progress-modal');
+            const progBar = document.getElementById('prog-bar');
+            const progText = document.getElementById('prog-text');
+            modal.classList.remove('hidden');
+
+            // Находим или создаем общую папку для отдельных файлов
+            let folders = await dbGetAll('folders');
+            let targetFolder = folders.find(f => f.name === "Разное" || f.name === "Einzelne Dateien");
+            let folderId;
+
+            if (!targetFolder) {
+                folderId = await dbAddFolder({ name: currentLang === 'de' ? "Einzelne Dateien" : "Разное", year: "Общий", path: "Разное" });
+            } else {
+                folderId = targetFolder.id;
+            }
 
             const totalFiles = files.length;
             let processed = 0;
@@ -234,15 +325,11 @@
 
             for (let i = 0; i < totalFiles; i += batchSize) {
                 const chunk = Array.from(files).slice(i, i + batchSize);
-                
+
                 await Promise.all(chunk.map(file => {
                     return new Promise((resolve) => {
                         const type = getMediaType(file);
-                        if (!type) {
-                            processed++;
-                            resolve();
-                            return;
-                        }
+                        if (!type) { processed++; resolve(); return; }
 
                         const reader = new FileReader();
                         reader.onload = async function(e) {
@@ -253,7 +340,7 @@
                                     name: file.name,
                                     type: type,
                                     blob: blob,
-                                    year: folderYear,
+                                    year: extractYear(file.name),
                                     size: file.size
                                 });
                             } catch (err) {
@@ -270,14 +357,12 @@
                 const percent = Math.round((processed / totalFiles) * 100);
                 progBar.style.width = percent + '%';
                 progText.innerText = `${i18n[currentLang].loadingProgress} ${processed} из ${totalFiles} (${percent}%)`;
-
                 await new Promise(r => setTimeout(r, 10));
             }
 
             modal.classList.add('hidden');
             progBar.style.width = '0%';
             event.target.value = '';
-
             await loadData();
         }
 
@@ -297,4 +382,246 @@
                 const store = transaction.objectStore('files');
                 const request = store.add(fileObj);
                 request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(requ
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function loadData() {
+            cachedFolders = await dbGetAll('folders');
+            cachedFiles = await dbGetAll('files');
+            render();
+        }
+
+        function dbGetAll(storeName) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                const req = store.getAll();
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        async function deleteFolder(folderId) {
+            if (!confirm(i18n[currentLang].deleteFolderConfirm)) return;
+            
+            const filesToDelete = cachedFiles.filter(f => f.folderId === folderId);
+            const tx = db.transaction(['folders', 'files'], 'readwrite');
+            
+            tx.objectStore('folders').delete(folderId);
+            const fileStore = tx.objectStore('files');
+            filesToDelete.forEach(f => fileStore.delete(f.id));
+
+            tx.oncomplete = async () => {
+                currentFolderId = null;
+                await loadData();
+            };
+        }
+
+        async function deleteFile(fileId, event) {
+            event.stopPropagation();
+            if (!confirm(i18n[currentLang].deleteFileConfirm)) return;
+
+            const tx = db.transaction(['files'], 'readwrite');
+            tx.objectStore('files').delete(fileId);
+            tx.oncomplete = async () => {
+                await loadData();
+            };
+        }
+
+        function render() {
+            const container = document.getElementById('grid-container');
+            const emptyState = document.getElementById('empty-state');
+            const titleEl = document.getElementById('current-section-title');
+            container.innerHTML = '';
+
+            let filteredFolders = cachedFolders;
+            let filteredFiles = cachedFiles;
+
+            if (searchQuery.trim() !== '') {
+                const q = searchQuery.toLowerCase();
+                filteredFolders = cachedFolders.filter(f => f.name.toLowerCase().includes(q) || f.year.toLowerCase().includes(q));
+                filteredFiles = cachedFiles.filter(f => f.name.toLowerCase().includes(q) || f.year.toLowerCase().includes(q));
+            }
+
+            if (currentFolderId === null && searchQuery.trim() === '') {
+                titleEl.innerText = i18n[currentLang].allFolders;
+                
+                if (cachedFolders.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                emptyState.classList.add('hidden');
+
+                cachedFolders.forEach(folder => {
+                    const folderFiles = cachedFiles.filter(f => f.folderId === folder.id);
+                    const coverFile = folderFiles.find(f => f.type === 'image' || f.type === 'video');
+                    let coverHtml = '';
+                    
+                    if (coverFile) {
+                        const coverUrl = URL.createObjectURL(coverFile.blob);
+                        if (coverFile.type === 'image') {
+                            coverHtml = `<img src="${coverUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Cover">`;
+                        } else if (coverFile.type === 'video') {
+                            // Исправлено превью для видео: используем тег video без контроллеров в режиме обложки
+                            coverHtml = `<video src="${coverUrl}#t=0.5" preload="metadata" muted class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></video>`;
+                        }
+                    }
+
+                    if (!coverHtml) {
+                        coverHtml = `<svg class="w-16 h-16 text-[#7B68EE]/60 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>`;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden border border-purple-200 flex flex-col cursor-pointer group";
+                    card.onclick = () => openFolder(folder.id, folder.name);
+
+                    card.innerHTML = `
+                        <div class="h-48 bg-[#F3EEF9] relative overflow-hidden flex items-center justify-center">
+                            ${coverHtml}
+                            <span class="absolute top-3 right-3 bg-[#EBE5F5] text-[#4A3575] border border-[#D0C2E8] text-sm font-bold px-3 py-1 rounded-full shadow">
+                                ${folder.year}
+                            </span>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow justify-between bg-white">
+                            <div>
+                                <h3 class="text-xl font-bold text-[#4A3324] truncate mb-1" title="${folder.name}">${folder.name}</h3>
+                                <p class="text-stone-500 text-sm font-medium">${folderFiles.length} ${i18n[currentLang].filesCount}</p>
+                            </div>
+                            <div class="mt-4 flex justify-end">
+                                <button onclick="event.stopPropagation(); deleteFolder(${folder.id})" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить папки">
+                                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+            } else {
+                if (currentFolderId !== null) {
+                    const currentFolder = cachedFolders.find(f => f.id === currentFolderId);
+                    if (currentFolder) titleEl.innerText = currentFolder.name;
+                } else {
+                    titleEl.innerText = "Результаты поиска";
+                }
+
+                const filesToShow = currentFolderId !== null 
+                    ? cachedFiles.filter(f => f.folderId === currentFolderId)
+                    : filteredFiles;
+
+                if (filesToShow.length === 0) {
+                    emptyState.classList.remove('hidden');
+                    return;
+                }
+                emptyState.classList.add('hidden');
+
+                filesToShow.forEach(file => {
+                    const fileUrl = URL.createObjectURL(file.blob);
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden border border-purple-200 flex flex-col group";
+
+                    let previewHtml = '';
+                    if (file.type === 'image') {
+                        previewHtml = `<img src="${fileUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 cursor-pointer" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">`;
+                    } else if (file.type === 'video') {
+                        previewHtml = `
+                            <div class="relative w-full h-full bg-black cursor-pointer flex items-center justify-center group" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">
+                                <video src="${fileUrl}" class="w-full h-full object-cover opacity-80"></video>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="bg-[#1E56A0]/90 text-white p-4 rounded-full shadow-lg group-hover:scale-110 transition border border-blue-300">
+                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    </div>
+                                </div>
+                            </div>`;
+                    } else if (file.type === 'audio') {
+                        previewHtml = `
+                            <div class="w-full h-full bg-[#EBE5F5] flex flex-col items-center justify-center p-4 cursor-pointer" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">
+                                <div class="bg-[#4A3575] text-white p-4 rounded-full shadow-md mb-2">
+                                    <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                                </div>
+                                <span class="text-xs font-bold text-[#4A3575]">Аудиозапись</span>
+                            </div>`;
+                    }
+
+                    card.innerHTML = `
+                        <div class="h-48 relative overflow-hidden bg-[#F3EEF9]">
+                            ${previewHtml}
+                        </div>
+                        <div class="p-4 flex items-center justify-between bg-white">
+                            <span class="text-[#4A3324] font-semibold truncate text-base flex-grow mr-2" title="${file.name}">${file.name}</span>
+                            <button onclick="deleteFile(${file.id}, event)" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить файл">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        function openFolder(folderId, folderName) {
+            currentFolderId = folderId;
+            searchQuery = '';
+            document.getElementById('search-input').value = '';
+            render();
+        }
+
+        function goHome() {
+            currentFolderId = null;
+            searchQuery = '';
+            document.getElementById('search-input').value = '';
+            render();
+        }
+
+        function handleSearch(query) {
+            searchQuery = query;
+            if (query.trim() !== '' && currentFolderId !== null) {
+                currentFolderId = null;
+            }
+            render();
+        }
+
+        function openMedia(type, url, name) {
+            const modal = document.getElementById('media-modal');
+            const container = document.getElementById('media-container');
+            const titleEl = document.getElementById('media-title');
+            container.innerHTML = '';
+            titleEl.innerText = name;
+
+            if (type === 'image') {
+                container.innerHTML = `<img src="${url}" class="max-h-[80vh] max-w-full object-contain rounded-xl shadow-2xl">`;
+            } else if (type === 'video') {
+                container.innerHTML = `<video src="${url}" controls autoplay class="max-h-[80vh] max-w-full rounded-xl shadow-2xl"></video>`;
+            } else if (type === 'audio') {
+                container.innerHTML = `
+                    <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl border border-purple-200">
+                        <div class="bg-[#4A3575] text-white p-6 rounded-full mb-6">
+                            <svg class="w-16 h-16 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                        </div>
+                        <audio src="${url}" controls autoplay class="w-80"></audio>
+                    </div>`;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeMediaModal() {
+            const modal = document.getElementById('media-modal');
+            const container = document.getElementById('media-container');
+            modal.classList.add('hidden');
+            container.innerHTML = '';
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initDB();
+                await loadData();
+            } catch (err) {
+                console.error("Ошибка инициализации IndexedDB:", err);
+                alert("Не удалось запустить локальную базу данных в браузере.");
+            }
+        });
+    </script>
+</body>
+</html>
