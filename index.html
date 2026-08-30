@@ -7,46 +7,45 @@
     <!-- Tailwind CSS через CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Плавные переходы и кастомный скроллбар */
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #fcfbf9;
-            color: #2d2a26;
+            background-color: #F8F7FA; /* Легкий лавандово-молочный фон */
+            color: #2D2625;
         }
         input, button {
             font-size: 1.1rem;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col selection:bg-amber-200">
+<body class="min-h-screen flex flex-col selection:bg-purple-200">
 
-    <!-- Шапка приложения -->
-    <header class="bg-amber-800 text-white shadow-md sticky top-0 z-30">
+    <!-- Шапка приложения (Цвет дерева + Синий + Лаванда) -->
+    <header class="bg-[#4A3324] text-white shadow-lg sticky top-0 z-30 border-b-4 border-[#3178C6]">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
             
             <!-- Кнопка Домой и Заголовок -->
             <div class="flex items-center gap-4">
-                <button id="home-btn" onclick="goHome()" class="flex items-center gap-2 bg-amber-700 hover:bg-amber-600 px-4 py-3 rounded-xl transition cursor-pointer shadow border border-amber-600 font-semibold text-lg">
+                <button id="home-btn" onclick="goHome()" class="flex items-center gap-2 bg-[#1E56A0] hover:bg-[#164380] text-white px-5 py-3 rounded-xl transition cursor-pointer shadow-md font-semibold text-lg border border-blue-400">
                     <!-- SVG Домик -->
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                     <span id="txt-home">На главную</span>
                 </button>
-                <h1 id="app-title" class="text-2xl md:text-3xl font-bold tracking-wide">Семейный Архив</h1>
+                <h1 id="app-title" class="text-2xl md:text-3xl font-bold tracking-wide text-[#EBE5F5]">Семейный Архив</h1>
             </div>
 
             <!-- Управление: Поиск, Загрузка, Язык -->
             <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
                 <!-- Поиск -->
                 <div class="relative flex-1 md:w-72">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-stone-400">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-purple-200">
                         <!-- SVG Лупа -->
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                     </span>
-                    <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Поиск по имени или году..." class="w-full pl-10 pr-4 py-3 bg-amber-900/40 border border-amber-600/50 rounded-xl text-white placeholder-amber-200/70 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                    <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Поиск по имени или году..." class="w-full pl-10 pr-4 py-3 bg-[#3A261C] border border-[#6B5344] rounded-xl text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-[#7B68EE]">
                 </div>
 
-                <!-- Кнопка загрузки папки -->
-                <label class="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-5 py-3 rounded-xl cursor-pointer shadow transition font-semibold text-lg border border-amber-500">
+                <!-- Кнопка загрузки папки (Яркий синий акцент) -->
+                <label class="flex items-center gap-2 bg-[#1E56A0] hover:bg-[#164380] text-white px-5 py-3 rounded-xl cursor-pointer shadow-md transition font-semibold text-lg border border-blue-400">
                     <!-- SVG Папка плюс -->
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-1 8h-3v3h-2v-3h-3v-2h3V9h2v3h3v2z"/></svg>
                     <span id="txt-upload">Загрузить папку</span>
@@ -54,22 +53,21 @@
                 </label>
 
                 <!-- Переключатель языка -->
-                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-amber-900/50 border border-amber-600 text-white px-3 py-3 rounded-xl focus:outline-none cursor-pointer font-medium">
-                    <option value="ru" class="bg-amber-900 text-white">RU</option>
-                    <option value="de" class="bg-amber-900 text-white">DE</option>
+                <select id="lang-select" onchange="changeLanguage(this.value)" class="bg-[#3A261C] border border-[#6B5344] text-white px-3 py-3 rounded-xl focus:outline-none cursor-pointer font-medium">
+                    <option value="ru" class="bg-[#4A3324] text-white">RU</option>
+                    <option value="de" class="bg-[#4A3324] text-white">DE</option>
                 </select>
             </div>
         </div>
     </header>
 
-    <!-- Модальное окно прогресса загрузки (Защита от зависаний) -->
+    <!-- Модальное окно прогресса загрузки -->
     <div id="progress-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-stone-200">
-            <h3 id="prog-title" class="text-xl font-bold mb-3 text-stone-800">Идет загрузка файлов...</h3>
+        <div class="bg-white rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl border border-purple-200">
+            <h3 id="prog-title" class="text-xl font-bold mb-3 text-[#4A3324]">Идет загрузка файлов...</h3>
             <p id="prog-text" class="text-stone-600 mb-4 text-lg">Обработано файлов: 0 из 0</p>
-            <!-- Шкала прогресса -->
-            <div class="w-full bg-stone-200 rounded-full h-5 overflow-hidden mb-4">
-                <div id="prog-bar" class="bg-amber-600 h-full w-0 transition-all duration-300"></div>
+            <div class="w-full bg-purple-100 rounded-full h-5 overflow-hidden mb-4">
+                <div id="prog-bar" class="bg-[#1E56A0] h-full w-0 transition-all duration-300"></div>
             </div>
             <p class="text-sm text-stone-500 text-center" id="prog-sub">Пожалуйста, не закрывайте вкладку...</p>
         </div>
@@ -77,9 +75,9 @@
 
     <!-- Основной контент -->
     <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
-        <!-- Навигационные хлебные крошки / Заголовок текущего раздела -->
-        <div id="section-header" class="mb-6 flex justify-between items-center">
-            <h2 id="current-section-title" class="text-3xl font-bold text-stone-800">Все папки архива</h2>
+        <!-- Заголовок раздела -->
+        <div id="section-header" class="mb-6 flex justify-between items-center border-b border-purple-200 pb-3">
+            <h2 id="current-section-title" class="text-3xl font-bold text-[#4A3324]">Все папки архива</h2>
         </div>
 
         <!-- Сетка папок / файлов -->
@@ -89,35 +87,27 @@
 
         <!-- Заглушка пустого состояния -->
         <div id="empty-state" class="hidden flex flex-col items-center justify-center py-20 text-center">
-            <!-- SVG Пустая папка -->
-            <svg class="w-24 h-24 text-stone-300 mb-4 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
-            <p id="empty-text" class="text-2xl text-stone-500 font-medium">Архив пока пуст. Загрузите первую папку!</p>
+            <svg class="w-24 h-24 text-purple-300 mb-4 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+            <p id="empty-text" class="text-2xl text-stone-600 font-medium">Архив пока пуст. Загрузите первую папку!</p>
         </div>
     </main>
 
     <!-- Модальный плеер / просмотрщик -->
     <div id="media-modal" class="fixed inset-0 bg-black/90 z-50 hidden flex flex-col items-center justify-center p-4">
-        <!-- Кнопка закрытия -->
-        <button onclick="closeMediaModal()" class="absolute top-5 right-5 text-white bg-stone-800 hover:bg-stone-700 p-3 rounded-full transition shadow-lg cursor-pointer">
-            <!-- SVG Крестик -->
+        <button onclick="closeMediaModal()" class="absolute top-5 right-5 text-white bg-[#4A3324] hover:bg-[#3A261C] p-3 rounded-full transition shadow-lg cursor-pointer border border-purple-300">
             <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
         </button>
-
-        <!-- Контейнер медиа -->
-        <div id="media-container" class="max-w-5xl max-h-[85vh] w-full flex items-center justify-center overflow-hidden rounded-2xl">
-            <!-- Динамически вставляется img, video или audio -->
-        </div>
-        <div id="media-title" class="text-white mt-4 text-xl font-medium tracking-wide text-center"></div>
+        <div id="media-container" class="max-w-5xl max-h-[85vh] w-full flex items-center justify-center overflow-hidden rounded-2xl"></div>
+        <div id="media-title" class="text-purple-100 mt-4 text-xl font-medium tracking-wide text-center"></div>
     </div>
 
     <!-- Футер -->
-    <footer class="bg-stone-200 text-stone-600 py-6 text-center border-t border-stone-300 mt-auto">
+    <footer class="bg-[#EBE5F5] text-[#4A3324] py-6 text-center border-t border-purple-200 mt-auto font-medium">
         <p id="footer-text">Семейный архив памяти. Работает локально и безопасно на вашем устройстве.</p>
     </footer>
 
     <!-- Скрипт приложения -->
     <script>
-        // --- ЛОКАЛИЗАЦИЯ ---
         const i18n = {
             ru: {
                 home: "На главную",
@@ -172,7 +162,6 @@
             render();
         }
 
-        // --- ИДЕКСИРОВАННАЯ БАЗА ДАННЫХ (IndexedDB) ---
         let db;
         const DB_NAME = 'FamilyArchiveDB';
         const DB_VERSION = 1;
@@ -198,24 +187,31 @@
             });
         }
 
-        // --- СОСТОЯНИЕ ПРИЛОЖЕНИЯ ---
-        let currentFolderId = null; // null = список папок, число = просмотр файлов в папке
+        let currentFolderId = null;
         let searchQuery = '';
         let cachedFolders = [];
         let cachedFiles = [];
 
-        // Автоопределение года (ищет 4 цифры от 1900 до 2099 в названии)
         function extractYear(name) {
             const match = name.match(/(19\d{2}|20\d{2})/);
             return match ? match[0] : 'Общий';
         }
 
-        // --- ПОРЦИОННАЯ ЗАГРУЗКА ПАПКИ (Защита от Out of Memory) ---
+        // Надежное определение медиафайла с фолбэком на расширение (если браузер не передал mime-type)
+        function getMediaType(file) {
+            const mime = file.type || '';
+            const name = file.name.toLowerCase();
+
+            if (mime.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif|heic|bmp)$/.test(name)) return 'image';
+            if (mime.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|m4v)$/.test(name)) return 'video';
+            if (mime.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|aac|flac)$/.test(name)) return 'audio';
+            return null;
+        }
+
         async function handleFolderUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            // Определяем имя папки из пути первого файла (webkitRelativePath)
             let folderName = "Новая папка";
             const firstPath = files[0].webkitRelativePath;
             if (firstPath) {
@@ -225,44 +221,44 @@
 
             const folderYear = extractYear(folderName);
 
-            // Показываем модальное окно прогресса
             const modal = document.getElementById('progress-modal');
             const progBar = document.getElementById('prog-bar');
             const progText = document.getElementById('prog-text');
             modal.classList.remove('hidden');
 
-            // 1. Создаем папку в IndexedDB
             const folderId = await dbAddFolder({ name: folderName, year: folderYear });
 
             const totalFiles = files.length;
             let processed = 0;
-            const batchSize = 10; // Обрабатываем порциями по 10 файлов
+            const batchSize = 10;
 
             for (let i = 0; i < totalFiles; i += batchSize) {
                 const chunk = Array.from(files).slice(i, i + batchSize);
                 
                 await Promise.all(chunk.map(file => {
                     return new Promise((resolve) => {
-                        // Фильтруем только медиа файлы
-                        const type = getMediaType(file.type);
+                        const type = getMediaType(file);
                         if (!type) {
                             processed++;
                             resolve();
                             return;
                         }
 
-                        // Читаем в Blob, чтобы сохранить в IndexedDB
                         const reader = new FileReader();
                         reader.onload = async function(e) {
-                            const blob = new Blob([e.target.result], { type: file.type });
-                            await dbAddFile({
-                                folderId: folderId,
-                                name: file.name,
-                                type: type, // 'image', 'video', 'audio'
-                                blob: blob,
-                                year: folderYear,
-                                size: file.size
-                            });
+                            try {
+                                const blob = new Blob([e.target.result], { type: file.type || 'application/octet-stream' });
+                                await dbAddFile({
+                                    folderId: folderId,
+                                    name: file.name,
+                                    type: type,
+                                    blob: blob,
+                                    year: folderYear,
+                                    size: file.size
+                                });
+                            } catch (err) {
+                                console.error("Ошибка сохранения файла:", file.name, err);
+                            }
                             processed++;
                             resolve();
                         };
@@ -271,32 +267,20 @@
                     });
                 }));
 
-                // Обновляем прогресс-бар
                 const percent = Math.round((processed / totalFiles) * 100);
                 progBar.style.width = percent + '%';
                 progText.innerText = `${i18n[currentLang].loadingProgress} ${processed} из ${totalFiles} (${percent}%)`;
 
-                // Даем браузеру передохнуть и освободить память (предотвращает зависания)
-                await new Promise(r => setTimeout(r, 20));
+                await new Promise(r => setTimeout(r, 10));
             }
 
-            // Скрываем модалку и сбрасываем инпут
             modal.classList.add('hidden');
             progBar.style.width = '0%';
             event.target.value = '';
 
-            // Перезагружаем данные
             await loadData();
         }
 
-        function getMediaType(mime) {
-            if (mime.startsWith('image/')) return 'image';
-            if (mime.startsWith('video/')) return 'video';
-            if (mime.startsWith('audio/')) return 'audio';
-            return null;
-        }
-
-        // --- БАЗОВЫЕ ОПЕРАЦИИ INDEXEDDB ---
         function dbAddFolder(folder) {
             return new Promise((resolve, reject) => {
                 const transaction = db.transaction(['folders'], 'readwrite');
@@ -313,250 +297,4 @@
                 const store = transaction.objectStore('files');
                 const request = store.add(fileObj);
                 request.onsuccess = () => resolve(request.result);
-                request.onerror = () => reject(request.error);
-            });
-        }
-
-        async function loadData() {
-            cachedFolders = await dbGetAll('folders');
-            cachedFiles = await dbGetAll('files');
-            render();
-        }
-
-        function dbGetAll(storeName) {
-            return new Promise((resolve, reject) => {
-                const transaction = db.transaction([storeName], 'readonly');
-                const store = transaction.objectStore('storeName' === 'folders' ? 'folders' : 'files'); // исправление ниже
-                const req = db.transaction([storeName], 'readonly').objectStore(storeName).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
-            });
-        }
-
-        async function deleteFolder(folderId) {
-            if (!confirm(i18n[currentLang].deleteFolderConfirm)) return;
-            
-            // Удаляем файлы папки
-            const filesToDelete = cachedFiles.filter(f => f.folderId === folderId);
-            const tx = db.transaction(['folders', 'files'], 'readwrite');
-            
-            // Удаляем саму папку
-            tx.objectStore('folders').delete(folderId);
-            // Удаляем файлы
-            const fileStore = tx.objectStore('files');
-            filesToDelete.forEach(f => fileStore.delete(f.id));
-
-            tx.oncomplete = async () => {
-                currentFolderId = null;
-                await loadData();
-            };
-        }
-
-        async function deleteFile(fileId, event) {
-            event.stopPropagation();
-            if (!confirm(i18n[currentLang].deleteFileConfirm)) return;
-
-            const tx = db.transaction(['files'], 'readwrite');
-            tx.objectStore('files').delete(fileId);
-            tx.oncomplete = async () => {
-                await loadData();
-            };
-        }
-
-        // --- ОТРИСОВКА ИНТЕРФЕЙСА ---
-        function render() {
-            const container = document.getElementById('grid-container');
-            const emptyState = document.getElementById('empty-state');
-            const titleEl = document.getElementById('current-section-title');
-            container.innerHTML = '';
-
-            let filteredFolders = cachedFolders;
-            let filteredFiles = cachedFiles;
-
-            // Фильтрация по поиску
-            if (searchQuery.trim() !== '') {
-                const q = searchQuery.toLowerCase();
-                // Если ищем, показываем подходящие файлы и папки
-                filteredFolders = cachedFolders.filter(f => f.name.toLowerCase().includes(q) || f.year.toLowerCase().includes(q));
-                filteredFiles = cachedFiles.filter(f => f.name.toLowerCase().includes(q) || f.year.toLowerCase().includes(q));
-            }
-
-            if (currentFolderId === null && searchQuery.trim() === '') {
-                // РЕЖИМ ГЛАВНОГО ЭКРАНА (Список папок)
-                titleEl.innerText = i18n[currentLang].allFolders;
-                
-                if (cachedFolders.length === 0) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-                emptyState.classList.add('hidden');
-
-                cachedFolders.forEach(folder => {
-                    // Ищем обложку (первое фото или видео в папке)
-                    const folderFiles = cachedFiles.filter(f => f.folderId === folder.id);
-                    const coverFile = folderFiles.find(f => f.type === 'image' || f.type === 'video');
-                    let coverUrl = '';
-                    if (coverFile) {
-                        coverUrl = URL.createObjectURL(coverFile.blob);
-                    }
-
-                    const card = document.createElement('div');
-                    card.className = "bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden border border-stone-200 flex flex-col cursor-pointer group";
-                    card.onclick = () => openFolder(folder.id, folder.name);
-
-                    // HTML карточки папки с реальной обложкой
-                    card.innerHTML = `
-                        <div class="h-48 bg-stone-100 relative overflow-hidden flex items-center justify-center">
-                            ${coverUrl 
-                                ? `<img src="${coverUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Cover">`
-                                : `<svg class="w-16 h-16 text-amber-700/60 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>`
-                            }
-                            <span class="absolute top-3 right-3 bg-amber-800 text-white text-sm font-bold px-3 py-1 rounded-full shadow">
-                                ${folder.year}
-                            </span>
-                        </div>
-                        <div class="p-5 flex flex-col flex-grow justify-between">
-                            <div>
-                                <h3 class="text-xl font-bold text-stone-800 truncate mb-1" title="${folder.name}">${folder.name}</h3>
-                                <p class="text-stone-500 text-sm">${folderFiles.length} ${i18n[currentLang].filesCount}</p>
-                            </div>
-                            <div class="mt-4 flex justify-end">
-                                <button onclick="event.stopPropagation(); deleteFolder(${folder.id})" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить папку">
-                                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
-            } else {
-                // РЕЖИМ СОДЕРЖИМОГО ПАПКИ ИЛИ ПОИСКА
-                if (currentFolderId !== null) {
-                    const currentFolder = cachedFolders.find(f => f.id === currentFolderId);
-                    if (currentFolder) titleEl.innerText = currentFolder.name;
-                } else {
-                    titleEl.innerText = "Результаты поиска";
-                }
-
-                const filesToShow = currentFolderId !== null 
-                    ? cachedFiles.filter(f => f.folderId === currentFolderId)
-                    : filteredFiles;
-
-                if (filesToShow.length === 0) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-                emptyState.classList.add('hidden');
-
-                filesToShow.forEach(file => {
-                    const fileUrl = URL.createObjectURL(file.blob);
-                    const card = document.createElement('div');
-                    card.className = "bg-white rounded-2xl shadow-md hover:shadow-xl transition overflow-hidden border border-stone-200 flex flex-col group";
-
-                    let previewHtml = '';
-                    if (file.type === 'image') {
-                        previewHtml = `<img src="${fileUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 cursor-pointer" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">`;
-                    } else if (file.type === 'video') {
-                        previewHtml = `
-                            <div class="relative w-full h-full bg-black cursor-pointer flex items-center justify-center group" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">
-                                <video src="${fileUrl}" class="w-full h-full object-cover opacity-80"></video>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <div class="bg-amber-600/90 text-white p-4 rounded-full shadow-lg group-hover:scale-110 transition">
-                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                    </div>
-                                </div>
-                            </div>`;
-                    } else if (file.type === 'audio') {
-                        previewHtml = `
-                            <div class="w-full h-full bg-amber-100 flex flex-col items-center justify-center p-4 cursor-pointer" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">
-                                <div class="bg-amber-700 text-white p-4 rounded-full shadow-md mb-2">
-                                    <svg class="w-10 h-10 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                                </div>
-                                <span class="text-xs font-semibold text-amber-900">Аудиозапись</span>
-                            </div>`;
-                    }
-
-                    card.innerHTML = `
-                        <div class="h-48 relative overflow-hidden bg-stone-100">
-                            ${previewHtml}
-                        </div>
-                        <div class="p-4 flex items-center justify-between bg-white">
-                            <span class="text-stone-800 font-medium truncate text-base flex-grow mr-2" title="${file.name}">${file.name}</span>
-                            <button onclick="deleteFile(${file.id}, event)" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить файл">
-                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                            </button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-        }
-
-        function openFolder(folderId, folderName) {
-            currentFolderId = folderId;
-            searchQuery = '';
-            document.getElementById('search-input').value = '';
-            render();
-        }
-
-        function goHome() {
-            currentFolderId = null;
-            searchQuery = '';
-            document.getElementById('search-input').value = '';
-            render();
-        }
-
-        function handleSearch(query) {
-            searchQuery = query;
-            if (query.trim() !== '' && currentFolderId !== null) {
-                currentFolderId = null; // сбрасываем папку при глобальном поиске по всему архиву
-            }
-            render();
-        }
-
-        // --- МОДАЛЬНЫЙ ПЛЕЕР ---
-        function openMedia(type, url, name) {
-            const modal = document.getElementById('media-modal');
-            const container = document.getElementById('media-container');
-            const titleEl = document.getElementById('media-title');
-            container.innerHTML = '';
-            titleEl.innerText = name;
-
-            if (type === 'image') {
-                container.innerHTML = `<img src="${url}" class="max-h-[80vh] max-w-full object-contain rounded-xl shadow-2xl">`;
-            } else if (type === 'video') {
-                container.innerHTML = `<video src="${url}" controls autoplay class="max-h-[80vh] max-w-full rounded-xl shadow-2xl"></video>`;
-            } else if (type === 'audio') {
-                container.innerHTML = `
-                    <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl">
-                        <div class="bg-amber-700 text-white p-6 rounded-full mb-6">
-                            <svg class="w-16 h-16 fill-current" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-                        </div>
-                        <audio src="${url}" controls autoplay class="w-80"></audio>
-                    </div>`;
-            }
-
-            modal.classList.remove('hidden');
-        }
-
-        function closeMediaModal() {
-            const modal = document.getElementById('media-modal');
-            const container = document.getElementById('media-container');
-            modal.classList.add('hidden');
-            container.innerHTML = ''; // Останавливает воспроизведение видео/аудио
-        }
-
-        // --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ---
-        window.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await initDB();
-                await loadData();
-            } catch (err) {
-                console.error("Ошибка инициализации IndexedDB:", err);
-                alert("Не удалось запустить локальную базу данных в браузере.");
-            }
-        });
-    </script>
-</body>
-</html>
+                request.onerror = () => reject(requ
