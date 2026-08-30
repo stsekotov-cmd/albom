@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #F8F7FA; /* Лавандово-молочный фон */
+            background-color: #F8F7FA;
             color: #2D2625;
         }
         input, button {
@@ -19,7 +19,7 @@
 </head>
 <body class="min-h-screen flex flex-col selection:bg-purple-200">
 
-    <!-- Шапка приложения (Цвет дерева + Синий акцент + Лаванда) -->
+    <!-- Шапка приложения -->
     <header class="bg-[#4A3324] text-white shadow-lg sticky top-0 z-30 border-b-4 border-[#3178C6]">
         <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
             
@@ -44,7 +44,7 @@
                     <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Поиск..." class="w-full pl-10 pr-4 py-3 bg-[#3A261C] border border-[#6B5344] rounded-xl text-white placeholder-purple-200/70 focus:outline-none focus:ring-2 focus:ring-[#7B68EE]">
                 </div>
 
-                <!-- Кнопка загрузки папок (множество папок сразу) -->
+                <!-- Кнопка загрузки папок -->
                 <label class="flex items-center gap-2 bg-[#1E56A0] hover:bg-[#164380] text-white px-4 py-3 rounded-xl cursor-pointer shadow-md transition font-semibold text-lg border border-blue-400">
                     <!-- SVG Папки -->
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
@@ -128,6 +128,8 @@
                 filesCount: "файлов",
                 deleteFolderConfirm: "Вы уверены, что хотите удалить эту папку вместе с файлами?",
                 deleteFileConfirm: "Удалить этот файл?",
+                editFolderPrompt: "Введите новое название альбома:",
+                editFilePrompt: "Введите новое имя файла:",
                 loadingTitle: "Идет загрузка файлов...",
                 loadingProgress: "Обработано файлов:",
                 loadingSub: "Пожалуйста, не закрывайте вкладку...",
@@ -144,6 +146,8 @@
                 filesCount: "Dateien",
                 deleteFolderConfirm: "Möchten Sie diesen Ordner und alle darin enthaltenen Dateien wirklich löschen?",
                 deleteFileConfirm: "Diese Datei löschen?",
+                editFolderPrompt: "Geben Sie einen neuen Albumnamen ein:",
+                editFilePrompt: "Geben Sie einen neuen Dateinamen ein:",
                 loadingTitle: "Dateien werden geladen...",
                 loadingProgress: "Verarbeitete Dateien:",
                 loadingSub: "Bitte schließen Sie den Tab nicht...",
@@ -211,18 +215,16 @@
             const name = file.name.toLowerCase();
 
             if (mime.startsWith('image/') || /\.(jpg|jpeg|png|webp|gif|heic|bmp)$/.test(name)) return 'image';
-            if (mime.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|m4v)$/.test(name)) return 'video';
+            if (mime.startsWith('video/') || /\.(mp4|mov|avi|mkv|webm|m4v|mpg|mpeg)$/.test(name)) return 'video';
             if (mime.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|aac|flac)$/.test(name)) return 'audio';
             return null;
         }
 
-        // Загрузка множества папок (с поддержкой подпапок)
         async function handleFolderUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
 
-            // Группируем файлы по подпапкам
-            const folderMap = new Map(); // путь папки -> массив файлов
+            const folderMap = new Map();
             
             for (let file of files) {
                 const type = getMediaType(file);
@@ -232,7 +234,7 @@
                 if (file.webkitRelativePath) {
                     const parts = file.webkitRelativePath.split('/');
                     if (parts.length > 1) {
-                        parts.pop(); // убираем имя файла
+                        parts.pop();
                         folderPath = parts.join(' / ');
                     }
                 }
@@ -254,7 +256,7 @@
             for (let [folderPath, fileList] of folderMap.entries()) {
                 const folderName = folderPath.split(' / ').pop();
                 const folderYear = extractYear(folderPath);
-                const folderId = await dbAddFolder({ name: folderName, year: folderYear, path: folderPath });
+                const folderId = await dbAddFolder({ name: folderName, year: folderYear, path: folderPath, customCoverBlob: null });
 
                 const batchSize = 10;
                 for (let i = 0; i < fileList.length; i += batchSize) {
@@ -298,7 +300,6 @@
             await loadData();
         }
 
-        // Загрузка отдельных файлов
         async function handleFilesUpload(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -308,13 +309,12 @@
             const progText = document.getElementById('prog-text');
             modal.classList.remove('hidden');
 
-            // Находим или создаем общую папку для отдельных файлов
             let folders = await dbGetAll('folders');
             let targetFolder = folders.find(f => f.name === "Разное" || f.name === "Einzelne Dateien");
             let folderId;
 
             if (!targetFolder) {
-                folderId = await dbAddFolder({ name: currentLang === 'de' ? "Einzelne Dateien" : "Разное", year: "Общий", path: "Разное" });
+                folderId = await dbAddFolder({ name: currentLang === 'de' ? "Einzelne Dateien" : "Разное", year: "Общий", path: "Разное", customCoverBlob: null });
             } else {
                 folderId = targetFolder.id;
             }
@@ -402,6 +402,70 @@
             });
         }
 
+        // 1. Функция изменения НАЗВАНИЯ папки
+        async function editFolder(folderId, event) {
+            event.stopPropagation();
+            const folder = cachedFolders.find(f => f.id === folderId);
+            if (!folder) return;
+
+            const newName = prompt(i18n[currentLang].editFolderPrompt, folder.name);
+            if (!newName || newName.trim() === "") return;
+
+            folder.name = newName.trim();
+            folder.year = extractYear(folder.name);
+
+            const tx = db.transaction(['folders'], 'readwrite');
+            tx.objectStore('folders').put(folder);
+            tx.oncomplete = async () => {
+                await loadData();
+            };
+        }
+
+        // 2. Функция изменения ФОТО (ОБЛОЖКИ) папки
+        function changeFolderCover(folderId, event) {
+            event.stopPropagation();
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = async function(evt) {
+                    const blob = new Blob([evt.target.result], { type: file.type });
+                    const folder = cachedFolders.find(f => f.id === folderId);
+                    if (folder) {
+                        folder.customCoverBlob = blob;
+                        const tx = db.transaction(['folders'], 'readwrite');
+                        tx.objectStore('folders').put(folder);
+                        tx.oncomplete = async () => {
+                            await loadData();
+                        };
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        }
+
+        // 3. Функция изменения ИМЕНИ файла
+        async function editFile(fileId, event) {
+            event.stopPropagation();
+            const fileItem = cachedFiles.find(f => f.id === fileId);
+            if (!fileItem) return;
+
+            const newName = prompt(i18n[currentLang].editFilePrompt, fileItem.name);
+            if (!newName || newName.trim() === "") return;
+
+            fileItem.name = newName.trim();
+
+            const tx = db.transaction(['files'], 'readwrite');
+            tx.objectStore('files').put(fileItem);
+            tx.oncomplete = async () => {
+                await loadData();
+            };
+        }
+
         async function deleteFolder(folderId) {
             if (!confirm(i18n[currentLang].deleteFolderConfirm)) return;
             
@@ -455,21 +519,29 @@
 
                 cachedFolders.forEach(folder => {
                     const folderFiles = cachedFiles.filter(f => f.folderId === folder.id);
-                    const coverFile = folderFiles.find(f => f.type === 'image' || f.type === 'video');
                     let coverHtml = '';
                     
-                    if (coverFile) {
-                        const coverUrl = URL.createObjectURL(coverFile.blob);
-                        if (coverFile.type === 'image') {
+                    // Проверяем, есть ли пользовательская обложка
+                    if (folder.customCoverBlob) {
+                        const coverUrl = URL.createObjectURL(folder.customCoverBlob);
+                        coverHtml = `<img src="${coverUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Cover">`;
+                    } else {
+                        // Ищем фото внутри папки
+                        const coverFile = folderFiles.find(f => f.type === 'image');
+                        if (coverFile) {
+                            const coverUrl = URL.createObjectURL(coverFile.blob);
                             coverHtml = `<img src="${coverUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="Cover">`;
-                        } else if (coverFile.type === 'video') {
-                            // Исправлено превью для видео: используем тег video без контроллеров в режиме обложки
-                            coverHtml = `<video src="${coverUrl}#t=0.5" preload="metadata" muted class="w-full h-full object-cover group-hover:scale-105 transition duration-300"></video>`;
                         }
                     }
 
                     if (!coverHtml) {
-                        coverHtml = `<svg class="w-16 h-16 text-[#7B68EE]/60 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>`;
+                        coverHtml = `
+                            <div class="w-full h-full bg-[#2D2625] flex flex-col items-center justify-center text-white">
+                                <div class="bg-[#1E56A0] p-4 rounded-full shadow-lg mb-2 border border-blue-400">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg>
+                                </div>
+                                <span class="text-xs font-semibold text-purple-200">Альбом папки</span>
+                            </div>`;
                     }
 
                     const card = document.createElement('div');
@@ -488,9 +560,21 @@
                                 <h3 class="text-xl font-bold text-[#4A3324] truncate mb-1" title="${folder.name}">${folder.name}</h3>
                                 <p class="text-stone-500 text-sm font-medium">${folderFiles.length} ${i18n[currentLang].filesCount}</p>
                             </div>
-                            <div class="mt-4 flex justify-end">
-                                <button onclick="event.stopPropagation(); deleteFolder(${folder.id})" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить папки">
-                                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            <div class="mt-4 flex items-center justify-between pt-2 border-t border-purple-100">
+                                <div class="flex items-center gap-1">
+                                    <!-- Отдельная кнопка: Сменить обложку (фото) папки -->
+                                    <button onclick="changeFolderCover(${folder.id}, event)" class="flex items-center gap-1 text-xs bg-purple-100 hover:bg-purple-200 text-[#4A3575] font-semibold px-2.5 py-1.5 rounded-lg transition border border-purple-300" title="Загрузить фото для обложки">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                        <span>Обложка</span>
+                                    </button>
+                                    <!-- Отдельная кнопка: Изменить название папки -->
+                                    <button onclick="editFolder(${folder.id}, event)" class="flex items-center gap-1 text-xs bg-blue-50 hover:bg-blue-100 text-[#1E56A0] font-semibold px-2.5 py-1.5 rounded-lg transition border border-blue-200" title="Изменить название папки">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                        <span>Имя</span>
+                                    </button>
+                                </div>
+                                <button onclick="deleteFolder(${folder.id})" class="text-stone-400 hover:text-red-600 p-1.5 rounded-lg transition" title="Удалить папку">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                                 </button>
                             </div>
                         </div>
@@ -526,13 +610,11 @@
                         previewHtml = `<img src="${fileUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300 cursor-pointer" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">`;
                     } else if (file.type === 'video') {
                         previewHtml = `
-                            <div class="relative w-full h-full bg-black cursor-pointer flex items-center justify-center group" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">
-                                <video src="${fileUrl}" class="w-full h-full object-cover opacity-80"></video>
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <div class="bg-[#1E56A0]/90 text-white p-4 rounded-full shadow-lg group-hover:scale-110 transition border border-blue-300">
-                                        <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                    </div>
+                            <div class="relative w-full h-full bg-[#1A1A1A] cursor-pointer flex items-center justify-center group" onclick="openMedia('${file.type}', '${fileUrl}', '${file.name}')">
+                                <div class="bg-[#1E56A0] text-white p-4 rounded-full shadow-lg group-hover:scale-110 transition border border-blue-400 z-10">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                                 </div>
+                                <div class="absolute bottom-2 left-2 text-xs text-purple-200 bg-black/60 px-2 py-1 rounded">Видеофайл</div>
                             </div>`;
                     } else if (file.type === 'audio') {
                         previewHtml = `
@@ -548,11 +630,18 @@
                         <div class="h-48 relative overflow-hidden bg-[#F3EEF9]">
                             ${previewHtml}
                         </div>
-                        <div class="p-4 flex items-center justify-between bg-white">
-                            <span class="text-[#4A3324] font-semibold truncate text-base flex-grow mr-2" title="${file.name}">${file.name}</span>
-                            <button onclick="deleteFile(${file.id}, event)" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить файл">
-                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                            </button>
+                        <div class="p-4 flex items-center justify-between bg-white gap-2">
+                            <span class="text-[#4A3324] font-semibold truncate text-base flex-grow" title="${file.name}">${file.name}</span>
+                            <div class="flex items-center gap-1">
+                                <!-- Отдельная кнопка: Изменить имя файла -->
+                                <button onclick="editFile(${file.id}, event)" class="flex items-center gap-1 text-xs bg-blue-50 hover:bg-blue-100 text-[#1E56A0] font-semibold px-2.5 py-1.5 rounded-lg transition border border-blue-200" title="Изменить имя файла">
+                                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                    <span>Имя</span>
+                                </button>
+                                <button onclick="deleteFile(${file.id}, event)" class="text-stone-400 hover:text-red-600 p-2 rounded-lg transition" title="Удалить файл">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     `;
                     container.appendChild(card);
